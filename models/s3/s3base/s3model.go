@@ -41,9 +41,9 @@ func (m S3Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			switch m.Choice {
 			case "create-bucket":
-				return bucket.NewS3BucketModel(m, "create"), nil
+				return bucket.NewS3BucketModel(m, "create-bucket"), nil
 			case "delete-bucket":
-				return bucket.NewS3BucketModel(m, "delete"), nil
+				return bucket.NewS3BucketModel(m, "delete-bucket"), nil
 			}
 		}
 	}
