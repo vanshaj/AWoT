@@ -25,7 +25,7 @@ func CreateBucket(bucketName string) error {
 func DeleteBucket(bucketName string) error {
 	cfg := internal.Config.Config.(aws.Config)
 	svc := s3.NewFromConfig(cfg)
-	internal.Logger.Debugf("Creating bucket %s\n", bucketName)
+	internal.Logger.Debugf("Delete bucket %s\n", bucketName)
 	_, err := svc.DeleteBucket(context.TODO(), &s3.DeleteBucketInput{
 		Bucket: aws.String(bucketName),
 	})
@@ -34,4 +34,15 @@ func DeleteBucket(bucketName string) error {
 	}
 
 	return nil
+}
+
+func ListBuckets() (*s3.ListBucketsOutput, error) {
+	cfg := internal.Config.Config.(aws.Config)
+	svc := s3.NewFromConfig(cfg)
+	internal.Logger.Debugf("Listing buckets")
+	res, err := svc.ListBuckets(context.TODO(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }

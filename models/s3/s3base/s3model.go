@@ -3,6 +3,8 @@ package s3base
 import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	bucketapi "github.com/vanshaj/awot/api/s3/bucket"
+	"github.com/vanshaj/awot/internal"
 	"github.com/vanshaj/awot/models/modelbase"
 	"github.com/vanshaj/awot/models/s3/bucket"
 )
@@ -15,6 +17,7 @@ func NewS3Model(m tea.Model) *S3Model {
 	items := []list.Item{
 		modelbase.Item("create-bucket"),
 		modelbase.Item("delete-bucket"),
+		modelbase.Item("list-buckets"),
 	}
 	return &S3Model{
 		modelbase.BaseListModel{
@@ -44,7 +47,15 @@ func (m S3Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return bucket.NewS3BucketModel(m, "create-bucket"), nil
 			case "delete-bucket":
 				return bucket.NewS3BucketModel(m, "delete-bucket"), nil
+			case "list-buckets":
+				res, err := bucketapi.ListBuckets()
+				if err != nil {
+					internal.Logger.Debugf("Error during list buckets %s\n", err.Error())
+				}
+				return bucket.NewS3BucketListModel(m, res), nil
 			}
+		case "esc":
+			return m.ParentModel, nil
 		}
 	}
 	var cmd tea.Cmd

@@ -8,6 +8,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/vanshaj/awot/internal"
 )
 
 const ListHeight = 14
@@ -57,6 +58,7 @@ type BaseListModel struct {
 }
 
 func (m BaseListModel) Init() tea.Cmd {
+	internal.Logger.Debug("from base model")
 	return nil
 }
 
