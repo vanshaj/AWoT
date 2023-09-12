@@ -7,7 +7,7 @@ import (
 )
 
 type AwsConfig struct {
-	Config config.Config
+	config.Config
 }
 
 var Config *AwsConfig

@@ -1,4 +1,4 @@
-package bucket
+package s3
 
 import (
 	"context"
@@ -8,10 +8,10 @@ import (
 	"github.com/vanshaj/awot/internal"
 )
 
-func CreateBucket(bucketName string) error {
-	cfg := internal.Config.Config.(aws.Config)
-	svc := s3.NewFromConfig(cfg)
+func (svc S3Client) CreateBucketViaClient(bucketName string) error {
 	internal.Logger.Debugf("Creating bucket %s\n", bucketName)
+	//fn := func(opt *s3.Options) { opt.Region = regionName }
+	//fns := []func(opt *s3.Options){fn}
 	_, err := svc.CreateBucket(context.TODO(), &s3.CreateBucketInput{
 		Bucket: aws.String(bucketName),
 	})
@@ -22,9 +22,7 @@ func CreateBucket(bucketName string) error {
 	return nil
 }
 
-func DeleteBucket(bucketName string) error {
-	cfg := internal.Config.Config.(aws.Config)
-	svc := s3.NewFromConfig(cfg)
+func (svc S3Client) DeleteBucketViaClient(bucketName string) error {
 	internal.Logger.Debugf("Delete bucket %s\n", bucketName)
 	_, err := svc.DeleteBucket(context.TODO(), &s3.DeleteBucketInput{
 		Bucket: aws.String(bucketName),
@@ -36,9 +34,7 @@ func DeleteBucket(bucketName string) error {
 	return nil
 }
 
-func ListBuckets() (*s3.ListBucketsOutput, error) {
-	cfg := internal.Config.Config.(aws.Config)
-	svc := s3.NewFromConfig(cfg)
+func (svc S3Client) ListBucketsViaClient() (*s3.ListBucketsOutput, error) {
 	internal.Logger.Debugf("Listing buckets")
 	res, err := svc.ListBuckets(context.TODO(), nil)
 	if err != nil {

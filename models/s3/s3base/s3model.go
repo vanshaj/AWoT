@@ -3,7 +3,7 @@ package s3base
 import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	bucketapi "github.com/vanshaj/awot/api/s3/bucket"
+	locals3 "github.com/vanshaj/awot/api/s3"
 	"github.com/vanshaj/awot/internal"
 	"github.com/vanshaj/awot/models/modelbase"
 	"github.com/vanshaj/awot/models/s3/bucket"
@@ -48,7 +48,8 @@ func (m S3Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "delete-bucket":
 				return bucket.NewS3BucketModel(m, "delete-bucket"), nil
 			case "list-buckets":
-				res, err := bucketapi.ListBuckets()
+				s3Client := locals3.NewS3Client()
+				res, err := s3Client.ListBucketsViaClient()
 				if err != nil {
 					internal.Logger.Debugf("Error during list buckets %s\n", err.Error())
 				}
