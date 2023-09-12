@@ -13,13 +13,14 @@ type S3BucketActionModel struct {
 	modelbase.BaseSpinnerModel
 	Action     string
 	BucketName string
+	RegionName string
 }
 
 type statusMsg int
 
 type errMsg struct{ err error }
 
-func NewS3BucketActionModel(m tea.Model, action string, name string) *S3BucketActionModel {
+func NewS3BucketActionModel(m tea.Model, action string, name string, region string) *S3BucketActionModel {
 	model := spinner.New()
 	model.Spinner = spinner.Dot
 	model.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("170"))
@@ -30,6 +31,7 @@ func NewS3BucketActionModel(m tea.Model, action string, name string) *S3BucketAc
 		},
 		action,
 		name,
+		region,
 	}
 }
 
@@ -70,6 +72,6 @@ func (m S3BucketActionModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case <-done:
 		return m.ParentModel, nil
 	case <-quit:
-		return nil, tea.Quit
+		return m.ParentModel, tea.Quit
 	}
 }
