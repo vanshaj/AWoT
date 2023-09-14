@@ -25,7 +25,7 @@ var (
 
 type Item string
 
-func (i Item) FilterValue() string { return "" }
+func (i Item) FilterValue() string { return string(i) }
 
 type ItemDelegate struct{}
 
@@ -57,6 +57,34 @@ type BaseListModel struct {
 	ParentModel tea.Model
 }
 
+type Option func(*BaseListModel)
+
+func WithList(items ...string) Option {
+	return func(m *BaseListModel) {
+		internal.Logger.Debugf("len of list is %d", len(items))
+		listItems := make([]list.Item, len(items))
+		for index, value := range items {
+			listItem := Item(value)
+			listItems[index] = listItem
+		}
+		m.List = list.New(listItems, ItemDelegate{}, DefaultWidth, ListHeight)
+	}
+}
+
+func WithParentModelList(parentModel tea.Model) Option {
+	return func(m *BaseListModel) {
+		m.ParentModel = parentModel
+	}
+}
+
+func NewBaseListModel(option ...Option) *BaseListModel {
+	model := &BaseListModel{}
+	for _, o := range option {
+		o(model)
+	}
+	return model
+}
+
 func (m BaseListModel) Init() tea.Cmd {
 	internal.Logger.Debug("from base model")
 	return nil
@@ -77,8 +105,46 @@ func (m BaseListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if ok {
 				m.Choice = string(i)
 			}
+			switch m.Choice {
+			case "ec2":
+				list := []string{"create-ec2", "create-vpc"}
+				ec2Model := NewBaseListModel(
+					WithList(list...),
+					WithParentModelList(m))
+				return ec2Model, nil
+			case "s3":
+				list := []string{"create-bucket", "delete-bucket", "list-buckets"}
+				s3Model := NewBaseListModel(
+					WithList(list...),
+					WithParentModelList(m))
+				return s3Model, nil
+			case "create-bucket":
+				items := []string{"bucket-name", "region-name"}
+				createBucketModel := NewBaseTextInputModel(
+					WithTextInputs(items...),
+					WithParentModelText(m),
+					WithActionText("create-bucket"))
+				return createBucketModel, nil
+			case "delete-bucket":
+				items := []string{"bucket-name", "region-name"}
+				createBucketModel := NewBaseTextInputModel(
+					WithTextInputs(items...),
+					WithParentModelText(m),
+					WithActionText("delete-bucket"))
+				return createBucketModel, nil
+			case "list-buckets":
+				listBucketModel := NewBaseSpinnerModel(
+					WithCustomSpinner(),
+					WithActionSpinner("list-buckets"),
+					WithParentModelSpinner(m))
+				return listBucketModel.Update(msg)
+			}
 		case "esc":
-			return m.ParentModel, nil
+			if m.ParentModel != nil {
+				return m.ParentModel, nil
+			} else {
+				return m, tea.Quit
+			}
 		}
 	}
 	var cmd tea.Cmd
