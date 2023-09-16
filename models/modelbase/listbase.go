@@ -113,13 +113,13 @@ func (m BaseListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					WithParentModelList(m))
 				return ec2Model, nil
 			case "s3":
-				list := []string{"create-bucket", "delete-bucket", "list-buckets"}
+				list := []string{"create-bucket", "delete-bucket", "list-buckets", "put-object"}
 				s3Model := NewBaseListModel(
 					WithList(list...),
 					WithParentModelList(m))
 				return s3Model, nil
 			case "create-bucket":
-				items := []string{"bucket-name", "region-name"}
+				items := []string{"bucket-name", "policy-path", "region-name"}
 				createBucketModel := NewBaseTextInputModel(
 					WithTextInputs(items...),
 					WithParentModelText(m),
@@ -138,6 +138,13 @@ func (m BaseListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					WithActionSpinner("list-buckets"),
 					WithParentModelSpinner(m))
 				return listBucketModel.Update(msg)
+			case "put-object":
+				items := []string{"bucket-name", "object-name", "file-path"}
+				createBucketModel := NewBaseTextInputModel(
+					WithTextInputs(items...),
+					WithParentModelText(m),
+					WithActionText("put-object"))
+				return createBucketModel, nil
 			}
 		case "esc":
 			if m.ParentModel != nil {

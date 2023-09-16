@@ -90,7 +90,8 @@ func (m BaseSpinnerModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			done <- listBucketModel
 		case "create-bucket":
 			bucketName := m.Data[0]
-			err := s3client.CreateBucketViaClient(bucketName)
+			policyPath := m.Data[1]
+			err := s3client.CreateBucketViaClient(bucketName, policyPath)
 			if err != nil {
 				internal.Logger.Debug(err.Error())
 				quit <- struct{}{}
@@ -99,6 +100,16 @@ func (m BaseSpinnerModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "delete-bucket":
 			bucketName := m.Data[0]
 			err := s3client.DeleteBucketViaClient(bucketName)
+			if err != nil {
+				internal.Logger.Debug(err.Error())
+				quit <- struct{}{}
+			}
+			done <- m.ParentModel
+		case "put-object":
+			bucketName := m.Data[0]
+			keyName := m.Data[1]
+			filePath := m.Data[2]
+			err := s3client.CreateObjectViaClient(bucketName, keyName, filePath)
 			if err != nil {
 				internal.Logger.Debug(err.Error())
 				quit <- struct{}{}

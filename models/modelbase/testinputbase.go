@@ -64,7 +64,7 @@ func (m BaseTextInputModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case "enter":
 			switch m.Action {
-			case "create-bucket", "delete-bucket":
+			case "create-bucket", "delete-bucket", "put-object":
 				details := make([]string, len(m.TextInputs))
 				for index, textInput := range m.TextInputs {
 					details[index] = textInput.Value()
